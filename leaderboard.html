@@ -9,7 +9,7 @@
 </body>
 
 <template name="leaderboard">
-  {{> sort}}
+  {{> controls}}
 
   <div class="leaderboard">
     {{#each players}}
@@ -28,6 +28,7 @@
   {{#unless selected_name}}
   <div class="none">Click a player to select</div>
   {{/unless}}
+
 </template>
 
 <template name="player">
@@ -37,10 +38,13 @@
   </div>
 </template>
 
-<template name="sort">
+<template name="controls">
   <div class="sort">
     Sort by:
     <button class="name">Name</button>
     <button class="score">Score</button>
+  </div>
+  <div class="randomize">
+    <button class="randomize">Randomize scores</button>    
   </div>
 </template>

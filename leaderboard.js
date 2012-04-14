@@ -3,6 +3,13 @@
 
 Players = new Meteor.Collection("players");
 
+function randomizeScores() {
+  Players.find().forEach(function(player) {
+      Players.update(player, {$set: {score: Math.floor(Math.random()*10)*5}});
+    });  
+    Session.set("sort", "score");
+}
+
 if (Meteor.is_client) {
   Template.leaderboard.players = function () {
     var sort = Session.equals('sort', 'name') ? {name:1} : {score:-1};
@@ -33,12 +40,15 @@ if (Meteor.is_client) {
     }
   };
 
-  Template.sort.events = {
+  Template.controls.events = {
     'click button.name': function () {
       Session.set("sort", "name");
     },
     'click button.score': function () {
       Session.set("sort", "score");
+    },
+    'click button.randomize': function () {
+      randomizeScores();
     }
   };
 }
@@ -47,15 +57,14 @@ if (Meteor.is_client) {
 if (Meteor.is_server) {
   Meteor.startup(function () {
     if (Players.find().count() === 0) {
-      Session.set('sort', score);
-      var names = ["Ada Lovelace",
+      var names = ["Marie Curie",
                    "Grace Hopper",
-                   "Marie Curie",
+                   "Ada Lovelace",
+                   "Nicola Tesla",
                    "Carl Friedrich Gauss",
-                   "Nikola Tesla",
                    "Claude Shannon"];
-      for (var i = 0; i < names.length; i++)
-        Players.insert({name: names[i], score: Math.floor(Math.random()*10)*5});
+      randomizeScores();
+      Session.set('sort', 'score');
     }
   });
 }
