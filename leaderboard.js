@@ -3,20 +3,30 @@
 
 Players = new Meteor.Collection("players");
 
+function randomScore() {
+  return Math.floor(Math.random()*10)*5;
+}
+
+/* 
+  helper function to randomize player scores
+*/
 function randomizeScores() {
   Players.find().forEach(function(player) {
-      Players.update(player, {$set: {score: Math.floor(Math.random()*10)*5}});
+      Players.update(player, {$set: {score: randomScore()}});
     });  
     Session.set("sort", "score");
 }
 
+// process client and template requests
 if (Meteor.is_client) {
   Template.leaderboard.players = function () {
+    // evaluate sorting order reversing it as necessary
     var order = Session.get("order");
     if(!order) {
       order = 1;
       Session.set('order', order);
     }
+    // determine the sorting
     var sort = Session.equals('sort', 'name') ? {name:order} : {score:order};
     return Players.find({}, {sort: sort});
   };
@@ -56,6 +66,11 @@ if (Meteor.is_client) {
     },
     'click button.randomize': function () {
       randomizeScores();
+    },
+    'click button.create': function () {
+      var name = $('#pname').val();      
+      var score = randomScore();
+      Players.insert({name: name, score: score});
     }
   };
 }
