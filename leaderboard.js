@@ -12,7 +12,12 @@ function randomizeScores() {
 
 if (Meteor.is_client) {
   Template.leaderboard.players = function () {
-    var sort = Session.equals('sort', 'name') ? {name:1} : {score:-1};
+    var order = Session.get("order");
+    if(!order) {
+      order = 1;
+      Session.set('order', order);
+    }
+    var sort = Session.equals('sort', 'name') ? {name:order} : {score:order};
     return Players.find({}, {sort: sort});
   };
 
@@ -43,9 +48,11 @@ if (Meteor.is_client) {
   Template.controls.events = {
     'click button.name': function () {
       Session.set("sort", "name");
+      Session.set("order", Session.get("order") * -1);
     },
     'click button.score': function () {
       Session.set("sort", "score");
+      Session.set("order", Session.get("order") * -1);
     },
     'click button.randomize': function () {
       randomizeScores();
@@ -64,7 +71,8 @@ if (Meteor.is_server) {
                    "Carl Friedrich Gauss",
                    "Claude Shannon"];
       randomizeScores();
-      Session.set('sort', 'score');
     }
+    Session.set('sort', 'score');
+    Session.set("order", 1);
   });
 }
